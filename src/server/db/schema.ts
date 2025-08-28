@@ -3,6 +3,7 @@
 
 import { sql } from "drizzle-orm";
 import { index, pgTableCreator } from "drizzle-orm/pg-core";
+import { neon } from '@neondatabase/serverless';
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -12,7 +13,7 @@ import { index, pgTableCreator } from "drizzle-orm/pg-core";
  */
 export const createTable = pgTableCreator((name) => `ipt-less4_${name}`);
 
-export const api_keys = createTable("api_keys",(d) => ({
+export const apiKeys = createTable("api_keys",(d) => ({
     // id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
     id: d.text("id").primaryKey(),
     name: d.varchar({ length: 256 }).notNull(),

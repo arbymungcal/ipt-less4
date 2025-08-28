@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { BookOpen, Plus } from "lucide-react";
@@ -20,14 +21,64 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "~/components/ui/table"
+} from "~/components/ui/table";
 import { Badge } from "~/components/ui/badge";
 import { Separator } from "@radix-ui/react-separator";
+import { useEffect, useState } from "react";
 
-
+type KeyItem = {
+  id: string;
+  name: string;
+  masked: string;
+  createdAt: string;
+  revoked: boolean;
+};
 
 export default function KeysPage() {
-  const sampleApiKey = "adadadadadada";
+  const [name, setName] = useState("My API Key");
+  const [justCreated, setJustCreated] = useState<{
+    key: string;
+    id: string;
+  } | null>(null);  
+  const [loading, setLoading] = useState(false);  
+  const [items, setItems] = useState<KeyItem[]>([]);
+
+  async function createKey() {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }), 
+      });
+      const data = await res.json();
+      setJustCreated(data);
+      if (res.ok) {
+        setJustCreated({ key: data.key, id: data.id }); 
+        await load();
+      }else{
+        alert(data.error ?? "Failed to create API key");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+  async function load() {
+  const res = await fetch("/api/keys", { cache: "no-store" });
+  const data = await res.json();
+  setItems(data ?? []);
+}
+
+  async function revokeKey(id: string) {
+    const res = await fetch(`/api/keys?keyId=${id}`, { method: "DELETE" });
+    const data = await res.json();
+    if (!res.ok) alert(data.error ?? "Failed to revoke API key");
+    await load(); 
+  }
+
+  useEffect(() => {
+    load();
+  }, [createKey, revokeKey]);
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-6">
@@ -51,7 +102,10 @@ export default function KeysPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle>Generate API Key</CardTitle>
-          <Button className="flex items-center gap-2" aria-label="Create API key">
+          <Button className="flex items-center gap-2" aria-label="Create API key" 
+          onClick={createKey} 
+          disabled={loading}
+          >
             <Plus />
             Create
           </Button>
@@ -62,22 +116,24 @@ export default function KeysPage() {
             <Input
               placeholder="Key Name (e.g., Production)"
               aria-label="API Key Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
 
-          {/* Not Visible if no API keys exist */}
-          <div className="rounded-md border p-3">
+          {justCreated && (<div className="rounded-md border p-3">
             <p className="text-sm font-medium">
               Here is your API Key (visible once):{" "}
             </p>
             <div className="mt-2 flex items-center gap-2">
-              <code className="text-sm break-all">{sampleApiKey}</code>
-              <CopyButton value={sampleApiKey} />
+              <code className="text-sm break-all">{justCreated.key}</code>
+              <CopyButton value={justCreated.key} />
             </div>
             <p className="text-muted-foreground mt-2 text-xs">
               Save this key securely. You won't be able to see it again.
             </p>
-          </div>
+          </div>)}
+          
         </CardContent>
       </Card>
 
@@ -98,27 +154,37 @@ export default function KeysPage() {
     </TableRow>
   </TableHeader>
   <TableBody>
-     <TableRow>
-      <TableCell>Name of Key</TableCell>
-      <TableCell className="font-mono">{sampleApiKey}</TableCell>
-      <TableCell>8/21/2025</TableCell>
-      <TableCell>
-
-        <Badge variant={"secondary"}>Revoked</Badge>
+    {items.map((row) => (
+      <TableRow key={row.id}>
+        <TableCell>{row.name}</TableCell>
+        <TableCell className="font-mono">{row.masked}</TableCell>
+        <TableCell>
+          {new Date(row.createdAt).toLocaleString()}
+          {row.revoked ? (
+            <Badge variant={"secondary"}> Revoked </Badge>
+          ) : (
+            <Badge>Active</Badge>
+          )}
+        </TableCell>  
+        <TableCell className="text-right">
+          <Button
+            variant="destructive"
+            size="sm"
+            disabled={row.revoked}
+            onClick={() => revokeKey(row.id)}
+          >
+             Revoke
+          </Button>
         </TableCell>
-      <TableCell className="text-right">
-        <Button variant={"destructive"} size={"sm"}>
-          Revoke
-        </Button>
-      </TableCell>
-    </TableRow> 
-    <TableRow>
-      <TableCell colSpan={5}
-       className="text-muted-foreground text-center text-sm"
-      >
-        No API Keys Yet
-      </TableCell>
-    </TableRow> 
+      </TableRow>
+    ))}
+    {items.length === 0 && (
+      <TableRow>
+        <TableCell colSpan={5} className="text-center">
+          No API keys found.
+        </TableCell>
+      </TableRow>
+    )}
   </TableBody>
 </Table>
   </CardContent>

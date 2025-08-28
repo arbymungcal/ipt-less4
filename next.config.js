@@ -6,7 +6,7 @@ import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
 const config = {
-    typrescript: {
+    typescript: {
         ignoreBuildErrors: true,
     },
     eslint: {
