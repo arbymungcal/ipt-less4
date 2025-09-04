@@ -15,10 +15,20 @@ const baseUrl = typeof window !== "undefined" ? window.location.origin : "http:/
 export default function DocsPage() {
   const [key, setKey] = useState("");
   const [out, setOut] = useState("");
+  const [postBody, setPostBody] = useState("Hello World!");
   
   async function runGET() {
     const res = await fetch(`${baseUrl}/api/ping`, {
-      headers: {'x-api-key': out},
+      headers: {'x-api-key': key},
+     });
+     setOut(JSON.stringify( await res.json(), null, 2));
+  }
+
+  async function runPOST() {
+    const res = await fetch(`${baseUrl}/api/echo`, {
+        method: "POST",
+        headers: { 'x-api-key': key,"Content-Type": "application/json" },
+        body: JSON.stringify({ postBody }),
      });
      setOut(JSON.stringify( await res.json(), null, 2));
   }
@@ -101,13 +111,13 @@ export default function DocsPage() {
                   />
                   <div className="flex flex-wrap gap-2">
                     <Button onClick={runGET}>Test GET/api/ping</Button>
-                    <Button variant="secondary">Test POST/api/echo</Button>
+                    <Button onClick={runPOST} variant="secondary">Test POST/api/echo</Button>
                   </div>
                   <Label className="text-sm font-medium">POST body (JSON)</Label>
                   <Textarea 
                   rows={5}
-                  // value={postBody}
-                  // onChange={(e) => setPostBody(e.target.value)}
+                  value={postBody}
+                  onChange={(e) => setPostBody(e.target.value)}
                   />
                     <Label className="text-sm font-medium">Response</Label>
                     <Textarea rows={10} readOnly value={out} 
