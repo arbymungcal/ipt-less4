@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     return Response.json({ error: result.reason }, { status: 401 });
   }
 
-  const res = await fetch("http://localhost:3000/api/images");
+  const res = await fetch("https://ipt-les2-sigma.vercel.app/api/images");
 
   // if Site A fails, return safe JSON
   if (!res.ok) {
