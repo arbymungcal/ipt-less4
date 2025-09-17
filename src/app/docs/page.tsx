@@ -37,9 +37,23 @@ export default function DocsPage() {
      setOut(JSON.stringify( await res.json(), null, 2));
   }
 
-  async function runImages() {
+ async function runImages() {
+  let bodyObj = {};
+  try {
+    // Try to parse what user typed as JSON
+    bodyObj = JSON.parse(postBody);
+  } catch (e) {
+    // fallback: treat input as plain string (name filter)
+    bodyObj = { name: postBody };
+  }
+
   const res = await fetch(`${baseUrl}/api/images`, {
-    headers: { "x-api-key": key },
+    method: "POST",
+    headers: {
+      "x-api-key": key,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(bodyObj),
   });
 
   const text = await res.text();
@@ -48,11 +62,10 @@ export default function DocsPage() {
   try {
     const data = JSON.parse(text);
 
-    // If Site A returns { ok: true, images: [...] }
     if (data.images) {
       setImages(data.images);
     } else {
-      setImages(data); // fallback if it's just an array
+      setImages(data);
     }
 
     setOut(JSON.stringify(data, null, 2));
@@ -60,6 +73,7 @@ export default function DocsPage() {
     setOut(`❌ Failed to parse JSON:\n\n${text}`);
   }
 }
+
 
 
 
@@ -182,4 +196,3 @@ useEffect(() => {
 
     );
 }
-
