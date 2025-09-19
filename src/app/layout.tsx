@@ -8,7 +8,6 @@ import { cn } from "~/lib/utils";
 import Image from "next/image";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -37,17 +36,15 @@ export default function RootLayout({
       <html lang="en" className={`${geist.variable} dark`}>
         <body
           className={cn(
-            "bg-gradient-to-br from-gray-900 via-black to-gray-950 text-gray-100 min-h-screen flex flex-col"
+            "bg-gradient-to-br from-emerald-950 via-gray-900 to-black text-gray-100 min-h-screen flex flex-col"
           )}
         >
           {/* Top Navigation */}
-          <header className="sticky top-0 z-50 border-b border-gray-800 bg-black/60 backdrop-blur-md">
+          <header className="sticky top-0 z-50 border-b border-emerald-900 bg-black/60 backdrop-blur-md">
             <div className="max-w-7xl mx-auto px-6">
               <TopNav />
             </div>
           </header>
-
-          
 
           {/* Page Layout */}
           <main className="flex-1 flex justify-center px-4 py-10">
@@ -57,9 +54,10 @@ export default function RootLayout({
               {/* Featured Manga */}
               <section>
                 <h2 className="text-2xl font-bold flex items-center gap-2">
-                  Featured <Badge variant="secondary">Hot</Badge>
+                  Featured{" "}
+                  <Badge className="bg-emerald-600 text-white">Hot</Badge>
                 </h2>
-                <Separator className="my-3 bg-gray-700" />
+                <Separator className="my-3 bg-emerald-800" />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[
@@ -81,7 +79,7 @@ export default function RootLayout({
                   ].map((manga, idx) => (
                     <Card
                       key={idx}
-                      className="bg-gray-900/70 border border-gray-800 rounded-xl overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-transform"
+                      className="bg-emerald-950/70 border border-emerald-900 rounded-xl overflow-hidden hover:shadow-lg hover:shadow-emerald-600/40 hover:scale-[1.02] transition-transform"
                     >
                       <div className="relative w-full h-52">
                         <Image
@@ -92,11 +90,15 @@ export default function RootLayout({
                         />
                       </div>
                       <CardHeader>
-                        <CardTitle>{manga.title}</CardTitle>
-                        <CardDescription>{manga.desc}</CardDescription>
+                        <CardTitle className="text-white">
+                          {manga.title}
+                        </CardTitle>
+                        <CardDescription className="text-gray-300">
+                          {manga.desc}
+                        </CardDescription>
                       </CardHeader>
                       <CardFooter>
-                        <Button variant="secondary" className="w-full">
+                        <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg">
                           Read Now
                         </Button>
                       </CardFooter>
@@ -108,7 +110,7 @@ export default function RootLayout({
               {/* Latest Manga Grid */}
               <section>
                 <h2 className="text-2xl font-bold">Latest Manga</h2>
-                <Separator className="my-3 bg-gray-700" />
+                <Separator className="my-3 bg-emerald-800" />
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
                   {[
                     { title: "One Piece", img: "/onep.jpg" },
@@ -120,7 +122,7 @@ export default function RootLayout({
                   ].map((manga, idx) => (
                     <Card
                       key={idx}
-                      className="bg-gray-900/70 border border-gray-800 rounded-lg overflow-hidden hover:shadow-lg hover:scale-105 transition-transform cursor-pointer"
+                      className="bg-emerald-950/70 border border-emerald-900 rounded-lg overflow-hidden hover:shadow-md hover:shadow-emerald-500/30 hover:scale-105 transition-transform cursor-pointer"
                     >
                       <div className="relative w-full h-64">
                         <Image
@@ -131,7 +133,7 @@ export default function RootLayout({
                         />
                       </div>
                       <CardHeader className="p-3">
-                        <CardTitle className="text-sm truncate">
+                        <CardTitle className="text-sm truncate text-white">
                           {manga.title}
                         </CardTitle>
                       </CardHeader>
@@ -143,7 +145,7 @@ export default function RootLayout({
           </main>
 
           {/* Footer */}
-          <footer className="border-t border-gray-800 bg-black/60 backdrop-blur-md py-6 text-center text-gray-400 text-sm">
+          <footer className="border-t border-emerald-900 bg-black/60 backdrop-blur-md py-6 text-center text-gray-400 text-sm">
             © {new Date().getFullYear()} MangaHub. All rights reserved.
           </footer>
         </body>
